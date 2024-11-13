@@ -57,8 +57,16 @@ Berikut adalah tutorial cara instalasi SoftEther VPN Server di Ubuntu 22.04 :
 2. **Tambahkan skrip berikut** ke dalam file:
    ```sh
    #!/bin/sh
-   # chkconfig: 2345 99 01
-   # description: SoftEther VPN Server
+   ### BEGIN INIT INFO
+   # Provides:          vpnserver
+   # Required-Start:    $remote_fs $syslog
+   # Required-Stop:     $remote_fs $syslog
+   # Default-Start:     2 3 4 5
+   # Default-Stop:      0 1 6
+   # chkconfig:         2345 99 01   
+   # Short-Description: SoftEther VPN Server
+   # Description:       Starts and stops SoftEther VPN Server
+   ### END INIT INFO
    DAEMON=/usr/local/vpnserver/vpnserver
    LOCK=/var/lock/subsys/vpnserver
    test -x $DAEMON || exit 0
@@ -98,6 +106,29 @@ Berikut adalah tutorial cara instalasi SoftEther VPN Server di Ubuntu 22.04 :
    ```
    update-rc.d vpnserver defaults
    ```
+   atau buat systemd service
+   ```
+   sudo nano /etc/systemd/system/vpnserver.service
+   ```
+   buat script seperti ini:
+   ```
+   [Unit]
+   Description=SoftEther VPN Server
+   After=network.target
+   
+   [Service]
+   Type=simple
+   ExecStartPre=/bin/sleep 5
+   ExecStart=/etc/init.d/vpnserver start
+   ExecStop=/etc/init.d/vpnserver stop
+   ExecReload=/etc/init.d/vpnserver restart
+   RemainAfterExit=yes
+   
+   [Install]
+   WantedBy=multi-user.target
+   ```
+   simpan, terus test restart pake systemctl, klo masih error gunakan chatgpt, jika selesai reboot
+   
 
 ### Langkah 3 – Konfigurasi SoftEther VPN Server
 
